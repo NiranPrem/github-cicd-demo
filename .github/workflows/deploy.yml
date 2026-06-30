@@ -1,0 +1,63 @@
+name: CI-CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  deploy:
+
+    runs-on: self-hosted
+
+    steps:
+
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Unit Tests
+      run: |
+        pytest -v
+
+    - name: Build Docker Image
+      run: |
+        docker build -t github-cicd-demo:latest .
+
+    - name: Trivy Filesystem Scan
+      run: |
+        trivy fs --severity HIGH,CRITICAL .
+
+    - name: Trivy Docker Image Scan
+      run: |
+        trivy image --severity HIGH,CRITICAL github-cicd-demo:latest
+
+    - name: Export Docker Image
+      run: |
+        docker save github-cicd-demo:latest -o github-cicd-demo.tar
+
+    - name: Import Image into K3s
+      run: |
+        sudo k3s ctr images import github-cicd-demo.tar
+
+    - name: Restart Deployment
+      run: |
+        kubectl rollout restart deployment/github-demo
+
+    - name: Wait for Rollout
+      run: |
+        kubectl rollout status deployment/github-demo
+
+    - name: Verify Pods
+      run: |
+        kubectl get pods

@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: github-demo
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: github-demo
+
+  template:
+    metadata:
+      labels:
+        app: github-demo
+
+    spec:
+      containers:
+      - name: github-demo
+
+        image: github-cicd-demo:latest
+
+        imagePullPolicy: Never
+
+        ports:
+        - containerPort: 8000
+
+        env:
+        - name: ENVIRONMENT
+          value: Production
+
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 15

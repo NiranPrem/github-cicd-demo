@@ -1,0 +1,21 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# GitHub Actions artifacts
+*.tar
+*.json
+*.sarif
+*.txt
+
+# Trivy
+trivy-report*
+filesystem-report*
+
+# Docker
+*.log
+
+# IDE
+.vscode/
+.idea/
