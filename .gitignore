@@ -1,21 +1,13 @@
-# Python
 venv/
 __pycache__/
+.pytest_cache/
 *.pyc
 
-# GitHub Actions artifacts
 *.tar
-*.json
 *.sarif
-*.txt
-
-# Trivy
+*.json
 trivy-report*
 filesystem-report*
 
-# Docker
-*.log
-
-# IDE
 .vscode/
 .idea/

@@ -49,19 +49,16 @@ jobs:
       run: |
         trivy image --severity HIGH,CRITICAL github-cicd-demo:latest
 
-    - name: Export Docker Image
-      run: |
-        docker save github-cicd-demo:latest -o github-cicd-demo.tar
 
-    - name: Import Image into K3s
-      run: |
-        sudo k3s ctr images import github-cicd-demo.tar
 
-    - name: Restart Deployment
+    - name: Deploy to K3s
       run: |
+        kubectl apply -f k8s/
         kubectl rollout restart deployment/github-demo
 
     - name: Wait for Rollout
+      run: |
+        kubectl rollout status deployment/github-demo --timeout=120s
       run: |
         kubectl rollout status deployment/github-demo
 
